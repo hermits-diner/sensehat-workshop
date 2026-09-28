@@ -7,6 +7,11 @@
 - OS: Raspberry Pi OS Full (64-bit), 2026-09-15 (Debian 13 Trixie)
 - 코드: **Python**과 **Scratch 3**를 나란히 비교
 
+## 바로 보기
+
+- **발표 슬라이드**: https://hermits-diner.github.io/sensehat-workshop/slides/
+- 첫 화면 (슬라이드 · 교재 PDF · 예제 코드 모음): https://hermits-diner.github.io/sensehat-workshop/
+
 ## 무엇이 있나요
 
 | 폴더 | 내용 |
@@ -28,7 +33,7 @@
 
 ## 사용법
 
-**슬라이드**: `slides` 폴더를 통째로 받아서 `index.html`을 브라우저로 엽니다.
+**슬라이드**: 웹에서 [바로 보기](https://hermits-diner.github.io/sensehat-workshop/slides/)로 열거나, 인터넷이 없을 때는 `slides` 폴더를 통째로 받아서 `index.html`을 브라우저로 엽니다.
 
 | 키 | 동작 |
 |---|---|
