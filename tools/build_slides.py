@@ -437,6 +437,48 @@ slide("마무리", f"""
 </div>""")
 
 
+# ================================================================ 부록: 추가 예제
+HEADER = ["from sense_hat import SenseHat", "sense = SenseHat()", "sense.set_rotation(180)", "sense.clear()"]
+
+
+def extra(path):
+    """예제 파일 → (번호, 제목, 새 개념, 첫 네 줄을 뺀 코드)"""
+    lines = path.read_text(encoding="utf-8").rstrip().split("\n")
+    key, rest = lines[0].lstrip("# ").split(" · ", 1)
+    title, concept = rest.split(" — ", 1)
+    body = lines[1:]
+    for h in HEADER:                    # 맨 위의 첫 네 줄만 뺀다 (본문 속 clear()는 남김)
+        body.remove(h)
+    while body and not body[0].strip():
+        body.pop(0)
+    code_text = "\n".join(body)
+    if len(body) > 30:                  # 너무 길면 64칸 그림 리스트 속을 한 줄로 줄여 보여 준다
+        code_text = re.sub(r"^(\w+) = \[\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code_text, flags=re.M)
+    return key, title, concept, code_text
+
+
+EXTRAS = [extra(p) for p in sorted((ROOT / "code" / "python" / "extra").glob("e*.py"))]
+EXTRA_CAPS = {
+    "e03": ["크게", "작게"], "e04": ["5 → 1", "GO!"], "e05": ["예: 43%", ""], "e06": ["25℃쯤", "35℃쯤"],
+    "e07": ["처음", "위로 밀면"], "e08": ["가운데", "오른쪽으로 기울이면"], "e09": ["기다림", "흔들면"],
+    "e10": ["초록불!", "반응 시간(ms)"], "e11": ["기록 중", "Saved"], "e12": ["빨간 물체", "파란 물체"],
+}
+
+slide("", '<div class="divider"><p>부록</p><h1>더 해 보기<br>추가 Python 예제 12개</h1></div>', cls="div-slide", part="부록")
+
+cards = "".join(
+    f'<div class="mini"><div class="num">{k}</div>{led(k)}<h4>{html.escape(t)}</h4></div>'
+    for k, t, c, _ in EXTRAS)
+slide("추가 예제 한눈에 보기", f'<div class="minis">{cards}</div>'
+      '<p class="note">파일 위치: <code>code/python/extra/</code> · 모두 첫 네 줄(회전·지우기)로 시작</p>')
+
+for k, t, c, py in EXTRAS:
+    slide(f"{k} · {t}", f"""<div class="cmp only-py">
+  <div class="col py"><div class="tag">Python <small>(첫 네 줄 생략)</small></div>{code(py)}</div>
+  <div class="col out"><div class="tag">LED 결과</div>{led(k, EXTRA_CAPS.get(k))}</div>
+</div><div class="concept"><span>새로 나오는 것</span> {html.escape(c)}</div>""")
+
+
 # ---------------------------------------------------------------- 출력
 CSS = (ROOT / "tools" / "slides.css").read_text(encoding="utf-8")
 JS = (ROOT / "tools" / "slides.js").read_text(encoding="utf-8")

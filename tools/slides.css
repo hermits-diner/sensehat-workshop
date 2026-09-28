@@ -129,3 +129,16 @@ body.show-notes .notes { display: block; }
 #bar { position: fixed; right: 14px; bottom: 8px; color: #999; font-size: 14px; font-family: sans-serif; display: flex; gap: 16px; }
 body:fullscreen #bar .keys { display: none; }
 @media print { #bar { display: none; } }
+
+/* 부록: 추가 예제 */
+.minis { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+.mini { background: #fff; border-radius: 16px; padding: 12px 8px; box-shadow: 0 4px 16px rgba(0,0,0,.07); display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.mini .num { background: var(--red); color: #fff; border-radius: 999px; padding: 2px 14px; font-size: 20px; font-weight: bold; }
+.mini h4 { margin: 0; font-size: 21px; text-align: center; line-height: 1.3; }
+.mini .ledrow { flex-wrap: nowrap; gap: 4px; }
+.mini .ledrow .arrow { font-size: 16px; }
+.mini .led { width: 86px; padding: 5px; gap: 2px; border-radius: 8px; }
+.mini .led i { box-shadow: none; }
+.cmp.only-py { grid-template-columns: 1.7fr .6fr; }
+.cmp.only-py pre.code { max-height: 610px; }
+.cmp .tag small { font-weight: normal; color: var(--muted); letter-spacing: 0; }

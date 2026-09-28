@@ -21,7 +21,7 @@
 | 폴더 | 내용 |
 |---|---|
 | [`pdf/`](pdf/) | **교사용 교재** `연수교재.pdf` (A4 가로, Python·Scratch 비교), `슬라이드원고.pdf` |
-| [`slides/`](slides/) | **발표 슬라이드** `index.html` (48장, 인터넷 없이 열림) |
+| [`slides/`](slides/) | **발표 슬라이드** `index.html` (62장 (부록: 추가 예제 12개 포함), 인터넷 없이 열림) |
 | [`code/python/`](code/python/) | Python 예제 16개 (s00~s12 기초, p01~p03 프로젝트) |
 | [`code/python/extra/`](code/python/extra/) | **추가 Python 예제 12개** (e01~e12, 아래 목록) |
 | [`code/scratch/`](code/scratch/) | Scratch 3 예제 15개 (`.sb3`) |

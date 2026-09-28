@@ -52,7 +52,8 @@ scratchblocks.renderMatching('pre.blocks', { style: 'scratch3', languages: ['en'
 function fitCode(slide) {
   for (const pre of slide.querySelectorAll('pre.code')) {
     let size = parseFloat(getComputedStyle(pre).fontSize);
-    while (pre.scrollWidth > pre.clientWidth + 1 && size > 14) pre.style.fontSize = (size -= 1) + 'px';
+    // 넓이와 높이 모두 칸 안에 들어올 때까지 줄인다
+    while ((pre.scrollWidth > pre.clientWidth + 1 || pre.scrollHeight > pre.clientHeight + 1) && size > 13) pre.style.fontSize = (size -= 1) + 'px';
   }
 }
 function fitBlocks(slide) {
