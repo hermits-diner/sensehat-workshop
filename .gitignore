@@ -1,0 +1,8 @@
+# 파이썬 캐시
+__pycache__/
+
+# SenseHAT 움직임 센서 보정 파일 (기기마다 자동 생성)
+RTIMULib.ini
+
+# PDF를 만들 때 생기는 중간 HTML
+pdf/*.html
