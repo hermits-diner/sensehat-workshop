@@ -4,6 +4,9 @@
 md → HTML(marked.js로 변환, scratchblocks로 블록 그림) → chromium 헤드리스 인쇄.
 사용법: python3 tools/build_pdf.py
 """
+import html
+import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -14,7 +17,7 @@ OUT = ROOT / "pdf"
 # PDF 이름: (넣을 원고 목록, 용지 방향)
 # 교재는 Python과 Scratch를 나란히 놓기 위해 가로(landscape)로 인쇄한다
 BOOKS = {
-    "연수교재.pdf": (["00_연수개요.md", "01_1차시.md", "02_2차시.md", "03_3차시.md"], "landscape"),
+    "연수교재.pdf": (["00_연수개요.md", "01_1차시.md", "02_2차시.md", "03_3차시.md", "@extra"], "landscape"),
     "슬라이드원고.pdf": (["slides_outline.md"], "portrait"),
 }
 
@@ -57,6 +60,17 @@ img { display: block; max-width: 58%; max-height: 72mm; margin: .5em 0 .8em;
 .compare .sc .label { color: #cc7a00; }
 .compare pre { margin: 0; }
 .compare .sc { background: #fbfaf5; border: 1px solid #e6dfcc; border-radius: 4px; padding: 6px; }
+/* 부록: Python ↔ LED 결과 */
+.compare.extra { grid-template-columns: 1fr 64mm; }
+.compare.extra .ledrow { flex-direction: row; align-items: flex-start; }
+.compare.extra .ledrow > b { transform: none; margin-top: 11mm; }
+.compare.extra .led { width: 27mm; }
+.compare .out .label { color: #2e7d32; }
+.ledrow { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.ledrow > b { color: #888; font-weight: normal; transform: rotate(90deg); }
+.ledbox { display: flex; flex-direction: column; align-items: center; font-size: 8.5pt; color: #666; }
+.led { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; width: 30mm; padding: 2mm; background: #15191e; border-radius: 3mm; }
+.led i { aspect-ratio: 1; border-radius: 1px; background: #2d333b; }
 """
 
 JS = """
@@ -93,10 +107,56 @@ scratchblocks.renderMatching('pre.blocks', { style: 'scratch3', languages: ['en'
 """
 
 
+# ---------------------------------------------------------------- 부록: 추가 예제
+HEADER = ["from sense_hat import SenseHat", "sense = SenseHat()", "sense.set_rotation(180)", "sense.clear()"]
+CAPS = {"e03": ["크게", "작게"], "e04": ["5 → 1", "GO!"], "e05": ["예: 43%", ""], "e06": ["25℃쯤", "35℃쯤"],
+        "e07": ["처음", "위로 밀면"], "e08": ["가운데", "오른쪽으로"], "e09": ["기다림", "흔들면"],
+        "e10": ["초록불!", "반응 시간"], "e11": ["기록 중", "Saved"], "e12": ["빨간 물체", "파란 물체"]}
+
+
+def led_html(frames, caps=None):
+    """실제 SenseHAT에서 읽은 LED 장면을 8×8 격자 HTML로"""
+    out = []
+    for i, frame in enumerate(frames):
+        cells = "".join(f'<i style="background:rgb({r},{g},{b})"></i>' if (r, g, b) != (0, 0, 0) else "<i></i>"
+                        for r, g, b in frame)
+        cap = f"<span>{caps[i]}</span>" if caps and caps[i] else ""
+        out.append(f'<div class="ledbox"><div class="led">{cells}</div>{cap}</div>')
+    return '<div class="ledrow">' + '<b>→</b>'.join(out) + "</div>"
+
+
+def extra_md():
+    """code/python/extra/*.py 로 부록 원고(Markdown + HTML)를 만든다"""
+    frames = json.loads((ROOT / "slides" / "led_frames.json").read_text())
+    md = ["# 부록 · 더 해 보기: 추가 Python 예제 12개", "",
+          "> 기초 12단계를 마친 뒤 해 볼 수 있는 예제입니다. 파일 위치: `code/python/extra/`",
+          "> 모든 파일은 **첫 네 줄**(`import` → `SenseHat()` → `set_rotation(180)` → `clear()`)로 시작하며, 아래에서는 생략합니다.",
+          "> LED 결과 그림은 실제 SenseHAT에서 읽은 장면입니다.", ""]
+    for path in sorted((ROOT / "code" / "python" / "extra").glob("e*.py")):
+        lines = path.read_text(encoding="utf-8").rstrip().split("\n")
+        key, rest = lines[0].lstrip("# ").split(" · ", 1)
+        title, concept = rest.split(" — ", 1)
+        body = lines[1:]
+        for h in HEADER:
+            body.remove(h)
+        while body and not body[0].strip():
+            body.pop(0)
+        code = "\n".join(body)
+        if len(body) > 30:   # 64칸 그림 리스트가 여러 개면 속을 줄여 보여 준다
+            code = re.sub(r"^(\w+) = \[\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code, flags=re.M)
+        md += [f"## {key} · {title}", "",
+               # 빈 줄이 있으면 Markdown이 HTML을 끊으므로 줄바꿈을 &#10;로 바꿔 한 줄로 만든다
+               f'<div class="compare extra"><div class="py"><div class="label">Python · <code>{path.name}</code></div>'
+               f'<pre><code class="language-python">{html.escape(code).replace(chr(10), "&#10;")}</code></pre></div>'
+               f'<div class="out"><div class="label">LED 결과</div>{led_html(frames[key], CAPS.get(key))}</div></div>', "",
+               f"- 새로 나오는 것: **{concept}**", ""]
+    return "\n".join(md)
+
+
 def build(pdf_name, md_files, orientation):
     parts = []
     for name in md_files:
-        text = (DOCS / name).read_text(encoding="utf-8")
+        text = extra_md() if name == "@extra" else (DOCS / name).read_text(encoding="utf-8")
         for k, v in EMOJI.items():
             text = text.replace(k, v)
         # <script> 안의 글자는 그대로 읽히므로 이스케이프하지 않고, 태그가 닫히는 것만 막는다
