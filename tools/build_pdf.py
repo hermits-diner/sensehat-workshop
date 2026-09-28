@@ -42,7 +42,7 @@ table { border-collapse: collapse; width: 100%; margin: .6em 0; }
 tr { break-inside: avoid; }
 th, td { border: 1px solid #bbb; padding: 4px 7px; vertical-align: top; }
 th { background: #f3e4e8; }
-code { font-family: 'NanumGothicCoding', monospace; background: #f4f4f4; padding: 0 3px; border-radius: 3px; }
+code { font-family: 'DejaVu Sans Mono', 'NanumGothicCoding', monospace; background: #f4f4f4; padding: 0 3px; border-radius: 3px; }
 pre { background: #f6f8fa; border: 1px solid #ddd; border-left: 4px solid #c51a4a;
       padding: 8px 10px; border-radius: 4px; break-inside: avoid; white-space: pre-wrap; }
 pre code { background: none; padding: 0; }
@@ -65,6 +65,7 @@ img { display: block; max-width: 58%; max-height: 72mm; margin: .5em 0 .8em;
 .compare.extra .ledrow { flex-direction: row; align-items: flex-start; }
 .compare.extra .ledrow > b { transform: none; margin-top: 11mm; }
 .compare.extra .led { width: 27mm; }
+.compare .concept { margin: 6px 0 0; font-size: 10pt; }
 .compare .out .label { color: #2e7d32; }
 .ledrow { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .ledrow > b { color: #888; font-weight: normal; transform: rotate(90deg); }
@@ -147,9 +148,10 @@ def extra_md():
         md += [f"## {key} · {title}", "",
                # 빈 줄이 있으면 Markdown이 HTML을 끊으므로 줄바꿈을 &#10;로 바꿔 한 줄로 만든다
                f'<div class="compare extra"><div class="py"><div class="label">Python · <code>{path.name}</code></div>'
-               f'<pre><code class="language-python">{html.escape(code).replace(chr(10), "&#10;")}</code></pre></div>'
-               f'<div class="out"><div class="label">LED 결과</div>{led_html(frames[key], CAPS.get(key))}</div></div>', "",
-               f"- 새로 나오는 것: **{concept}**", ""]
+               f'<pre><code class="language-python">{html.escape(code).replace(chr(10), "&#10;")}</code></pre>'
+               # 설명을 상자 안에 넣어 코드와 같은 쪽에 붙어 있게 한다
+               f'<p class="concept">새로 나오는 것: <b>{html.escape(concept)}</b></p></div>'
+               f'<div class="out"><div class="label">LED 결과</div>{led_html(frames[key], CAPS.get(key))}</div></div>', ""]
     return "\n".join(md)
 
 
