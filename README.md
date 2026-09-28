@@ -12,6 +12,10 @@
 - **발표 슬라이드**: https://hermits-diner.github.io/sensehat-workshop/slides/
 - 첫 화면 (슬라이드 · 교재 PDF · 예제 코드 모음): https://hermits-diner.github.io/sensehat-workshop/
 
+<img src="docs/images/qr_slides.png" alt="발표 슬라이드 QR코드" width="180">
+
+휴대폰 카메라로 찍으면 슬라이드가 열립니다.
+
 ## 무엇이 있나요
 
 | 폴더 | 내용 |
