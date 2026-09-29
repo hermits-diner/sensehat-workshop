@@ -13,13 +13,17 @@ move = {"up": (0, 1), "down": (0, -1), "left": (1, 0), "right": (-1, 0)}
 snake = [(3, 4), (2, 4)]         # 뱀 몸통 좌표 목록 (맨 앞이 머리)
 dx, dy = 1, 0                    # 처음에는 오른쪽으로 감
 apple = (6, 2)                   # 사과 위치
+turns = []                       # 눌렀지만 아직 쓰지 않은 방향 (빨리 두 번 눌러도 빠지지 않게)
 
 while True:
     for e in sense.stick.get_events():         # 그동안 누른 조이스틱 기록
         if e.action == "pressed" and e.direction in move:
-            ndx, ndy = move[e.direction]
-            if (ndx, ndy) != (-dx, -dy):       # 정반대로는 못 돌기
-                dx, dy = ndx, ndy
+            turns.append(move[e.direction])
+    while turns:                               # 한 칸 갈 때 방향은 한 번만 바꾸고, 나머지는 다음 칸에
+        ndx, ndy = turns.pop(0)
+        if (ndx, ndy) != (dx, dy) and (ndx, ndy) != (-dx, -dy):   # 같은 방향·정반대는 건너뜀
+            dx, dy = ndx, ndy
+            break
     x, y = snake[0]                            # 지금 머리 위치
     head = ((x + dx) % 8, (y + dy) % 8)        # 새 머리 (벽을 넘으면 반대편으로)
     if head in snake:                          # 내 몸에 부딪히면

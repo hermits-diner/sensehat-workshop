@@ -28,10 +28,10 @@ while ok:
     order.append(choice(["up", "down", "left", "right"]))   # 하나 늘리기
     sleep(0.8)
     for d in order:              # 순서 보여 주기
-        show(d, 0.5)
         sleep(0.2)
+        show(d, 0.5)
 
-    sense.stick.get_events()     # 보는 동안 눌린 기록 지우기
+    sense.stick.get_events()     # 보는 동안 눌린 기록 지우기 (마지막 불이 꺼지자마자 누른 것부터 받음)
     for d in order:              # 같은 순서로 밀었는지 하나씩 확인
         e = sense.stick.wait_for_event()
         while e.action != "pressed" or e.direction not in flip:

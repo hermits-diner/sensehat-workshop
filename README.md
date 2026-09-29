@@ -21,7 +21,7 @@
 | 폴더 | 내용 |
 |---|---|
 | [`pdf/`](pdf/) | **교사용 교재** `연수교재.pdf` (A4 가로, Python·Scratch 비교), `연수교재_세로.pdf` (A4 세로, 같은 내용을 적은 쪽수로), `슬라이드원고.pdf` |
-| [`slides/`](slides/) | **발표 슬라이드** `index.html` (73장, 부록에 추가 예제 12개·게임 4개, 인터넷 없이 열림), PowerPoint판 `발표슬라이드.pptx` (강사 메모는 노트에) |
+| [`slides/`](slides/) | **발표 슬라이드** `index.html` (74장, 부록에 추가 예제 12개·게임 4개, 인터넷 없이 열림), PowerPoint판 `발표슬라이드.pptx` (강사 메모는 노트에) |
 | [`code/python/`](code/python/) | Python 예제 16개 (s00~s12 기초, p01~p03 프로젝트) |
 | [`code/python/extra/`](code/python/extra/) | **추가 Python 예제 12개** (e01~e12, 아래 목록) |
 | [`code/python/game/`](code/python/game/) | **게임 4개** (g01~g04, 아래 목록) |
