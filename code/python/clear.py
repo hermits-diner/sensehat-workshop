@@ -1,8 +1,6 @@
-from sense_hat import SenseHat
-sense = SenseHat()
+from sense_hat import SenseHat  # SenseHAT 라이브러리
+sense = SenseHat()              # 보드 연결
 
-# LED 64개를 모두 끈다 (검은색으로 채우기)
-sense.clear()
+sense.clear()                   # LED 모두 끄기
 
-# 원하는 색으로 한 번에 채울 수도 있다 (빨강, 초록, 파랑: 0~255)
-# sense.clear(255, 0, 0)
+# sense.clear(255, 0, 0)        # 빨간색으로 채우기
