@@ -138,13 +138,13 @@ def extra_md():
         key, rest = lines[0].lstrip("# ").split(" · ", 1)
         title, concept = rest.split(" — ", 1)
         body = lines[1:]
-        for h in HEADER:
-            body.remove(h)
+        for h in HEADER:   # 주석은 빼고 코드 부분이 같은 첫 줄을 지운다
+            body.remove(next(l for l in body if l.split("#")[0].rstrip() == h))
         while body and not body[0].strip():
             body.pop(0)
         code = "\n".join(body)
         if len(body) > 30:   # 64칸 그림 리스트가 여러 개면 속을 줄여 보여 준다
-            code = re.sub(r"^(\w+) = \[\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code, flags=re.M)
+            code = re.sub(r"^(\w+) = \[.*\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code, flags=re.M)
         md += [f"## {key} · {title}", "",
                # 빈 줄이 있으면 Markdown이 HTML을 끊으므로 줄바꿈을 &#10;로 바꿔 한 줄로 만든다
                f'<div class="compare extra"><div class="py"><div class="label">Python · <code>{path.name}</code></div>'
@@ -155,10 +155,22 @@ def extra_md():
     return "\n".join(md)
 
 
+def strip_comments(py):
+    """좁은 칸에 넣을 코드에서 # 주석을 뺀다 (주석은 .py 파일에서 봄).
+    ※ 예제 코드의 문자열 속에는 #이 없다는 가정"""
+    out = []
+    for line in py.split("\n"):
+        if not line.lstrip().startswith("#"):
+            out.append(line.split("#")[0].rstrip())
+    return "\n".join(out)
+
+
 def build(pdf_name, md_files, orientation):
     parts = []
     for name in md_files:
         text = extra_md() if name == "@extra" else (DOCS / name).read_text(encoding="utf-8")
+        if name != "@extra":   # Scratch와 나란히 놓이는 좁은 칸이라 주석은 뺀다
+            text = re.sub(r"```python\n(.*?)```", lambda m: "```python\n" + strip_comments(m.group(1)) + "```", text, flags=re.S)
         for k, v in EMOJI.items():
             text = text.replace(k, v)
         # <script> 안의 글자는 그대로 읽히므로 이스케이프하지 않고, 태그가 닫히는 것만 막는다

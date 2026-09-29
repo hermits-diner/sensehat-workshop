@@ -59,8 +59,19 @@ LED = json.loads((OUT / "led_frames.json").read_text())
 
 
 # ---------------------------------------------------------------- 조각
-def code(py):
-    return f'<pre class="code"><code>{html.escape(py)}</code></pre>'
+def strip_comments(py):
+    """좁은 칸에 넣을 코드에서 # 주석을 뺀다 (주석은 .py 파일에서 봄).
+    ※ 예제 코드의 문자열 속에는 #이 없다는 가정"""
+    out = []
+    for line in py.split("\n"):
+        if not line.lstrip().startswith("#"):
+            out.append(line.split("#")[0].rstrip())
+    return "\n".join(out)
+
+
+def code(py, comments=False):
+    # Scratch와 나란히 놓는 좁은 칸은 글씨가 작아지지 않게 주석을 뺀다
+    return f'<pre class="code"><code>{html.escape(py if comments else strip_comments(py))}</code></pre>'
 
 
 def blocks(sb):
@@ -447,13 +458,13 @@ def extra(path):
     key, rest = lines[0].lstrip("# ").split(" · ", 1)
     title, concept = rest.split(" — ", 1)
     body = lines[1:]
-    for h in HEADER:                    # 맨 위의 첫 네 줄만 뺀다 (본문 속 clear()는 남김)
-        body.remove(h)
+    for h in HEADER:                    # 맨 위의 첫 네 줄만 뺀다 (본문 속 clear()는 남김, 주석은 무시)
+        body.remove(next(l for l in body if l.split("#")[0].rstrip() == h))
     while body and not body[0].strip():
         body.pop(0)
     code_text = "\n".join(body)
     if len(body) > 30:                  # 너무 길면 64칸 그림 리스트 속을 한 줄로 줄여 보여 준다
-        code_text = re.sub(r"^(\w+) = \[\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code_text, flags=re.M)
+        code_text = re.sub(r"^(\w+) = \[.*\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code_text, flags=re.M)
     return key, title, concept, code_text
 
 
@@ -474,7 +485,7 @@ slide("추가 예제 한눈에 보기", f'<div class="minis">{cards}</div>'
 
 for k, t, c, py in EXTRAS:
     slide(f"{k} · {t}", f"""<div class="cmp only-py">
-  <div class="col py"><div class="tag">Python <small>(첫 네 줄 생략)</small></div>{code(py)}</div>
+  <div class="col py"><div class="tag">Python <small>(첫 네 줄 생략)</small></div>{code(py, comments=True)}</div>
   <div class="col out"><div class="tag">LED 결과</div>{led(k, EXTRA_CAPS.get(k))}</div>
 </div><div class="concept"><span>새로 나오는 것</span> {html.escape(c)}</div>""")
 
