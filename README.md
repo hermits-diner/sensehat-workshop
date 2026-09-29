@@ -24,6 +24,7 @@
 | [`slides/`](slides/) | **발표 슬라이드** `index.html` (62장, 부록에 추가 예제 12개, 인터넷 없이 열림) |
 | [`code/python/`](code/python/) | Python 예제 16개 (s00~s12 기초, p01~p03 프로젝트) |
 | [`code/python/extra/`](code/python/extra/) | **추가 Python 예제 12개** (e01~e12, 아래 목록) |
+| [`code/carbon/`](code/carbon/) | **예제 코드 그림** Python 예제 28개를 Carbon 스타일 PNG로 (`tools/make_carbon.py`로 생성) |
 | [`code/scratch/`](code/scratch/) | Scratch 3 예제 15개 (`.sb3`) |
 | [`docs/`](docs/) | 교재 원고 (Markdown)와 캡처 그림 |
 | [`tools/`](tools/) | 원고에서 코드·PDF·슬라이드를 만드는 스크립트 |
