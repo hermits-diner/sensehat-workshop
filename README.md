@@ -24,8 +24,10 @@
 | [`slides/`](slides/) | **발표 슬라이드** `index.html` (62장, 부록에 추가 예제 12개, 인터넷 없이 열림) |
 | [`code/python/`](code/python/) | Python 예제 16개 (s00~s12 기초, p01~p03 프로젝트) |
 | [`code/python/extra/`](code/python/extra/) | **추가 Python 예제 12개** (e01~e12, 아래 목록) |
-| [`code/carbon/`](code/carbon/) | **예제 코드 그림** Python 예제 28개를 Carbon 스타일 PNG로 (`tools/make_carbon.py`로 생성) |
+| [`code/python/game/`](code/python/game/) | **게임 4개** (g01~g04, 아래 목록) |
+| [`code/carbon/`](code/carbon/) | **예제 코드 그림** Python 예제 32개를 Carbon 스타일 PNG로 (`tools/make_carbon.py`로 생성) |
 | [`code/scratch/`](code/scratch/) | Scratch 3 예제 15개 (`.sb3`) |
+| [`code/nodered/`](code/nodered/) | **Node-RED 온도 대시보드** 흐름 파일 (아래 사용법) |
 | [`docs/`](docs/) | 교재 원고 (Markdown)와 캡처 그림 |
 | [`tools/`](tools/) | 원고에서 코드·PDF·슬라이드를 만드는 스크립트 |
 
@@ -70,6 +72,28 @@
 | [g04_simon](code/python/game/g04_simon.py) | 색 순서 기억하기 — 한 판마다 하나씩 늘어남 | 조이스틱 |
 
 > 기울기 게임은 시작할 때의 자세를 "평평함"으로 삼으므로, 실행하는 순간에는 기기를 가만히 두세요.
+
+## Node-RED 온도 대시보드
+
+코드를 쓰지 않고 노드를 선으로 이어서 SenseHAT의 온도·습도·기압을 웹 화면에 보여 줍니다.
+흐름 파일: [`code/nodered/temperature_dashboard.json`](code/nodered/temperature_dashboard.json)
+
+```
+SenseHAT 센서 → 5초에 한 번만 → 값 나누기 ┬→ 온도 게이지 · 온도 그래프(최근 10분)
+                                          ├→ 습도 (%)
+                                          └→ 기압 (hPa)
+```
+
+1. **노드 설치** (처음 한 번): 터미널에서
+   ```bash
+   cd ~/.node-red
+   npm install node-red-node-pi-sense-hat @flowfuse/node-red-dashboard
+   ```
+2. **Node-RED 켜기**: `node-red-start` (끄기는 `node-red-stop`)
+3. **흐름 가져오기**: 브라우저에서 `http://localhost:1880` → 오른쪽 위 ☰ → 가져오기 → 파일 선택 → 가져오기 → **배포**
+4. **대시보드 보기**: `http://localhost:1880/dashboard` (같은 와이파이의 휴대폰에서는 `localhost` 대신 파이의 IP 주소)
+
+> SenseHAT 온도는 CPU 열 때문에 실제보다 높게 나옵니다. `값 나누기` 노드의 `보정` 값을 바꿔 맞추세요.
 
 ## 사용법
 

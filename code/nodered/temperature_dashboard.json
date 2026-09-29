@@ -1,0 +1,296 @@
+[
+  {
+    "id": "tab_temp",
+    "type": "tab",
+    "label": "SenseHAT 온도 대시보드",
+    "disabled": false,
+    "info": "SenseHAT의 온도·습도·기압을 5초마다 읽어 대시보드에 보여 준다.\n대시보드 주소: http://<라즈베리파이 주소>:1880/dashboard"
+  },
+  {
+    "id": "ui_base",
+    "type": "ui-base",
+    "name": "SenseHAT",
+    "path": "/dashboard",
+    "includeClientData": true,
+    "acceptsClientConfig": [
+      "ui-notification",
+      "ui-control"
+    ],
+    "showPathInSidebar": false,
+    "navigationStyle": "default"
+  },
+  {
+    "id": "ui_theme",
+    "type": "ui-theme",
+    "name": "SenseHAT 테마",
+    "colors": {
+      "surface": "#c51a4a",
+      "primary": "#c51a4a",
+      "bgPage": "#eeeeee",
+      "groupBg": "#ffffff",
+      "groupOutline": "#cccccc"
+    },
+    "sizes": {
+      "pagePadding": "12px",
+      "groupGap": "12px",
+      "groupBorderRadius": "8px",
+      "widgetGap": "12px"
+    }
+  },
+  {
+    "id": "ui_page",
+    "type": "ui-page",
+    "name": "온도",
+    "ui": "ui_base",
+    "path": "/temp",
+    "icon": "thermometer",
+    "layout": "grid",
+    "theme": "ui_theme",
+    "order": 1,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "ui_group",
+    "type": "ui-group",
+    "name": "SenseHAT 환경 센서",
+    "page": "ui_page",
+    "width": "6",
+    "height": "1",
+    "order": 1,
+    "showTitle": true,
+    "className": "",
+    "visible": "true",
+    "disabled": "false"
+  },
+  {
+    "id": "note",
+    "type": "comment",
+    "z": "tab_temp",
+    "name": "SenseHAT 값 → 5초에 한 번 → 온도·습도·기압으로 나눠 화면에 표시",
+    "info": "온도는 라즈베리파이 CPU 열 때문에 실제 방 온도보다 5~15℃ 높게 나옵니다.\n'값 나누기' 노드에서 보정값을 빼 보세요.",
+    "x": 330,
+    "y": 60,
+    "wires": []
+  },
+  {
+    "id": "sense_in",
+    "type": "rpi-sensehat in",
+    "z": "tab_temp",
+    "name": "SenseHAT 센서",
+    "motion": false,
+    "env": true,
+    "stick": false,
+    "x": 120,
+    "y": 140,
+    "wires": [
+      [
+        "rate"
+      ]
+    ]
+  },
+  {
+    "id": "rate",
+    "type": "delay",
+    "z": "tab_temp",
+    "name": "5초에 한 번만",
+    "pauseType": "rate",
+    "timeout": "5",
+    "timeoutUnits": "seconds",
+    "rate": "1",
+    "nbRateUnits": "5",
+    "rateUnits": "second",
+    "randomFirst": "1",
+    "randomLast": "5",
+    "randomUnits": "seconds",
+    "drop": true,
+    "allowrate": false,
+    "outputs": 1,
+    "x": 300,
+    "y": 140,
+    "wires": [
+      [
+        "split"
+      ]
+    ]
+  },
+  {
+    "id": "split",
+    "type": "function",
+    "z": "tab_temp",
+    "name": "값 나누기",
+    "outputs": 3,
+    "func": "// SenseHAT이 보내는 값: msg.payload = { temperature, humidity, pressure }\nconst e = msg.payload;\nconst 보정 = 0;   // 예: CPU 열 때문에 10℃ 높게 나오면 10\nreturn [\n    { payload: Math.round((e.temperature - 보정) * 10) / 10, topic: \"온도\" },  // 1번 출구: 온도(℃)\n    { payload: Math.round(e.humidity) },                                   // 2번 출구: 습도(%)\n    { payload: Math.round(e.pressure) }                                    // 3번 출구: 기압(hPa)\n];",
+    "outputLabels": [
+      "온도",
+      "습도",
+      "기압"
+    ],
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 470,
+    "y": 140,
+    "wires": [
+      [
+        "gauge",
+        "chart"
+      ],
+      [
+        "hum"
+      ],
+      [
+        "pres"
+      ]
+    ]
+  },
+  {
+    "id": "gauge",
+    "type": "ui-gauge",
+    "z": "tab_temp",
+    "name": "온도 게이지",
+    "group": "ui_group",
+    "order": 1,
+    "width": 3,
+    "height": 3,
+    "gtype": "gauge-half",
+    "gstyle": "needle",
+    "title": "온도",
+    "units": "℃",
+    "icon": "",
+    "prefix": "",
+    "suffix": "",
+    "segments": [
+      {
+        "from": "0",
+        "color": "#2196f3"
+      },
+      {
+        "from": "18",
+        "color": "#5cd65c"
+      },
+      {
+        "from": "28",
+        "color": "#ffc800"
+      },
+      {
+        "from": "35",
+        "color": "#ea5353"
+      }
+    ],
+    "min": 0,
+    "max": 50,
+    "sizeThickness": 16,
+    "sizeGap": 4,
+    "sizeKeyThickness": 8,
+    "styleRounded": true,
+    "styleGlow": false,
+    "className": "",
+    "x": 700,
+    "y": 100,
+    "wires": []
+  },
+  {
+    "id": "hum",
+    "type": "ui-text",
+    "z": "tab_temp",
+    "name": "습도",
+    "group": "ui_group",
+    "order": 2,
+    "width": 3,
+    "height": 1,
+    "label": "습도",
+    "format": "{{msg.payload}} %",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 690,
+    "y": 180,
+    "wires": []
+  },
+  {
+    "id": "pres",
+    "type": "ui-text",
+    "z": "tab_temp",
+    "name": "기압",
+    "group": "ui_group",
+    "order": 3,
+    "width": 3,
+    "height": 1,
+    "label": "기압",
+    "format": "{{msg.payload}} hPa",
+    "layout": "row-spread",
+    "style": false,
+    "font": "",
+    "fontSize": 16,
+    "color": "#717171",
+    "className": "",
+    "x": 690,
+    "y": 220,
+    "wires": []
+  },
+  {
+    "id": "chart",
+    "type": "ui-chart",
+    "z": "tab_temp",
+    "name": "온도 그래프",
+    "group": "ui_group",
+    "order": 4,
+    "width": 6,
+    "height": 5,
+    "label": "최근 10분 온도",
+    "chartType": "line",
+    "category": "topic",
+    "categoryType": "msg",
+    "xAxisLabel": "",
+    "xAxisProperty": "",
+    "xAxisPropertyType": "timestamp",
+    "xAxisType": "time",
+    "xAxisFormat": "",
+    "xAxisFormatType": "auto",
+    "yAxisLabel": "℃",
+    "yAxisProperty": "payload",
+    "yAxisPropertyType": "msg",
+    "ymin": "",
+    "ymax": "",
+    "action": "append",
+    "stackSeries": false,
+    "pointShape": "circle",
+    "pointRadius": 3,
+    "showLegend": false,
+    "removeOlder": "10",
+    "removeOlderUnit": "60",
+    "removeOlderPoints": "",
+    "interpolation": "linear",
+    "colors": [
+      "#c51a4a",
+      "#aec7e8",
+      "#ff7f0e",
+      "#2ca02c",
+      "#98df8a",
+      "#d62728",
+      "#ff9896",
+      "#9467bd",
+      "#c5b0d5"
+    ],
+    "textColor": [
+      "#666666"
+    ],
+    "textColorDefault": true,
+    "gridColor": [
+      "#e5e5e5"
+    ],
+    "gridColorDefault": true,
+    "className": "",
+    "x": 700,
+    "y": 140,
+    "wires": [
+      []
+    ]
+  }
+]
