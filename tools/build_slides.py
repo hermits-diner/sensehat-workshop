@@ -452,7 +452,7 @@ slide("마무리", f"""
 HEADER = ["from sense_hat import SenseHat", "sense = SenseHat()", "sense.set_rotation(180)", "sense.clear()"]
 
 
-def extra(path):
+def extra(path, shrink=True):
     """예제 파일 → (번호, 제목, 새 개념, 첫 네 줄을 뺀 코드)"""
     lines = path.read_text(encoding="utf-8").rstrip().split("\n")
     key, rest = lines[0].lstrip("# ").split(" · ", 1)
@@ -463,7 +463,7 @@ def extra(path):
     while body and not body[0].strip():
         body.pop(0)
     code_text = "\n".join(body)
-    if len(body) > 30:                  # 너무 길면 64칸 그림 리스트 속을 한 줄로 줄여 보여 준다
+    if shrink and len(body) > 30:       # 너무 길면 64칸 그림 리스트 속을 한 줄로 줄여 보여 준다
         code_text = re.sub(r"^(\w+) = \[.*\n(?:    .*\n)+\]", r"\1 = [ … 8줄 × 8칸 그림 (전체는 파일에) … ]", code_text, flags=re.M)
     return key, title, concept, code_text
 
@@ -483,11 +483,60 @@ cards = "".join(
 slide("추가 예제 한눈에 보기", f'<div class="minis">{cards}</div>'
       '<p class="note">파일 위치: <code>code/python/extra/</code> · 모두 첫 네 줄(회전·지우기)로 시작</p>')
 
-for k, t, c, py in EXTRAS:
-    slide(f"{k} · {t}", f"""<div class="cmp only-py">
+def extra_slides(items, concept_label):
+    for k, t, c, py in items:
+        slide(f"{k} · {t}", f"""<div class="cmp only-py">
   <div class="col py"><div class="tag">Python <small>(첫 네 줄 생략)</small></div>{code(py, comments=True)}</div>
   <div class="col out"><div class="tag">LED 결과</div>{led(k, EXTRA_CAPS.get(k))}</div>
-</div><div class="concept"><span>새로 나오는 것</span> {html.escape(c)}</div>""")
+</div><div class="concept"><span>{concept_label}</span> {html.escape(c)}</div>""")
+
+
+extra_slides(EXTRAS, "새로 나오는 것")
+
+# ---------------------------------------------------------------- 부록: 게임
+GAMES = [extra(p, shrink=False) for p in sorted((ROOT / "code" / "python" / "game").glob("g*.py"))]   # 미로 지도는 줄이지 않음
+EXTRA_CAPS.update({
+    "g01": ["처음", "사과 3개 먹은 뒤"], "g02": ["피하는 중", "맞으면 쾅!"], "g03": ["출발", "출구 가까이"],
+    "g04": ["① 위", "② 왼쪽"],
+})
+
+slide("", '<div class="divider"><p>부록</p><h1>더 해 보기<br>게임 4개</h1></div>', cls="div-slide", part="부록")
+
+cards = "".join(
+    f'<div class="mini"><div class="num">{k}</div>{led(k)}<h4>{html.escape(t)}</h4></div>'
+    for k, t, c, _ in GAMES)
+slide("게임 한눈에 보기", f'<div class="minis">{cards}</div>'
+      '<p class="note">파일 위치: <code>code/python/game/</code> · 기울기 게임은 시작할 때 기기를 가만히 두기</p>')
+
+
+
+MAX_LINES = 26   # 슬라이드 한 장에 읽을 만한 크기로 들어가는 코드 줄 수
+
+
+def pieces(py):
+    """긴 게임 코드를 빈 줄에서 끊어, 가장 적은 장 수로 나눈다 (그중 가장 긴 장이 가장 짧게)"""
+    lines = py.split("\n")
+    cuts = [i for i, l in enumerate(lines) if not l.strip()]
+    # best[i] = lines[:i]를 나누는 (장 수, 가장 긴 장의 줄 수, 끊는 자리들)
+    best = {0: (0, 0, [])}
+    for end in cuts + [len(lines)]:
+        options = [(n + 1, max(m, end - start), at + [end]) for start, (n, m, at) in best.items()
+                   if start < end and end - start <= MAX_LINES]
+        if options:
+            best[end + 1] = min(options)
+    n, m, at = best[len(lines) + 1]
+    starts = [0] + [e + 1 for e in at[:-1]]
+    return ["\n".join(lines[a:b]) for a, b in zip(starts, at)]
+
+
+# 게임 코드는 한 장에 다 들어가지 않으므로 여러 장으로 나눠 보여 준다
+for k, t, c, py in GAMES:
+    parts = pieces(py)
+    for n, part in enumerate(parts, 1):
+        slide(f"{k} · {t} ({n}/{len(parts)})", f"""<div class="cmp only-py">
+  <div class="col py"><div class="tag">Python <small>({"첫 네 줄 생략" if n == 1 else "이어서"})</small></div>{code(part, comments=True)}</div>
+  <div class="col out"><div class="tag">LED 결과</div>{led(k, EXTRA_CAPS.get(k))}</div>
+</div><div class="concept"><span>게임 방법</span> {html.escape(c)}</div>""")
 
 
 # ---------------------------------------------------------------- 출력

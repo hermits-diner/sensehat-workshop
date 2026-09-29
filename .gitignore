@@ -6,3 +6,9 @@ RTIMULib.ini
 
 # PDF를 만들 때 생기는 중간 HTML
 pdf/*.html
+
+# PowerPoint판을 만들 때 잠깐 생기는 캡처용 HTML
+slides/_capture.html
+
+# LibreOffice로 파일을 여는 동안 생기는 잠금 파일
+.~lock.*#
