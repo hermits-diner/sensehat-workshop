@@ -56,7 +56,20 @@
 | [e11_data_logger](code/python/extra/e11_data_logger.py) | 온도·습도·기압을 CSV로 저장 | 파일 쓰기 (엑셀로 열림) |
 | [e12_colour_name](code/python/extra/e12_colour_name.py) | 컬러 센서로 R·G·B 맞히기 (V2 전용) | `and` 조건 |
 
-> e07·e08은 Argon 케이스에서 조이스틱·기울기 방향이 반대로 읽히는 것을 코드에 반영했습니다.
+> e07·e08과 게임들은 Argon 케이스에서 조이스틱·기울기 방향이 반대로 읽히는 것을 코드에 반영했습니다.
+
+## 게임 (Python)
+
+조이스틱과 기울기 센서로 즐기는 짧은 게임입니다. `code/python/game/` 폴더에 있습니다.
+
+| 파일 | 내용 | 조작 |
+|---|---|---|
+| [g01_snake](code/python/game/g01_snake.py) | 뱀 게임 — 사과를 먹을수록 길어짐 | 조이스틱 |
+| [g02_dodge](code/python/game/g02_dodge.py) | 떨어지는 돌 피하기 — 점점 빨라짐 | 좌우 기울이기 |
+| [g03_maze](code/python/game/g03_maze.py) | 미로 탈출 — 출구까지 걸린 시간 재기 | 동서남북 기울이기 |
+| [g04_simon](code/python/game/g04_simon.py) | 색 순서 기억하기 — 한 판마다 하나씩 늘어남 | 조이스틱 |
+
+> 기울기 게임은 시작할 때의 자세를 "평평함"으로 삼으므로, 실행하는 순간에는 기기를 가만히 두세요.
 
 ## 사용법
 

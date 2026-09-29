@@ -156,7 +156,7 @@ def gallery(items):
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
-    files = sorted(SRC.glob("[sp]*.py")) + sorted((SRC / "extra").glob("e*.py"))
+    files = sorted(SRC.glob("[sp]*.py")) + sorted((SRC / "extra").glob("e*.py")) + sorted((SRC / "game").glob("g*.py"))
     items = []
     for path in files:
         render(path).save(OUT / f"{path.stem}.png", optimize=True)
